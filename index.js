@@ -1,10 +1,10 @@
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const OpenAI = require("openai");
 
-// 🔑 මෙතැනට ඔයාගේ Google Gemini API Key එක දාන්න (Google AI Studio එකෙන් නොමිලේ ගන්න පුළුවන්)
-const GEMINI_API_KEY = "AIzaSyBjzE30NZXDZsT-DuC9cBrksOjg0UsQM34";
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+// 🔑 මෙතැනට ඔයාගේ OpenAI (ChatGPT) API Key එක දාන්න
+const OPENAI_API_KEY = "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";
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 const CHROME_PATH = "/usr/bin/chromium-browser";
 
@@ -36,43 +36,45 @@ client.on("authenticated", () => {
 
 client.on("ready", () => {
     console.log("\n========================================");
-    console.log("🤖 PERSONAL AI BOT READY");
+    console.log("🤖 PERSONAL AI BOT READY (ChatGPT)");
     console.log("========================================");
 });
 
-// 🧠 Gemini AI එකෙන් පිළිතුරු සකස් කරගැනීම (නිවැරදි Model එක සමඟ)
+// 🧠 ChatGPT (OpenAI) එකෙන් පිළිතුරු සකස් කරගැනීම
 async function getAIResponse(userMessage) {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const prompt = `You are a helpful personal AI assistant. Reply naturally, politely, and concisely to this message: "${userMessage}"`;
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini", // ඉතාමත් වේගවත් සහ ලාභදායී මොඩල් එකක්
+            messages: [
+                { role: "system", content: "You are a helpful personal AI assistant. Reply naturally, politely, and concisely." },
+                { role: "user", content: userMessage }
+            ],
+        });
+        const textResponse = completion.choices[0].message.content;
+        console.log("💡 ChatGPT Response:", textResponse);
+        return textResponse;
     } catch (error) {
-        console.error("AI Error:", error);
-        return "Sorry මං චුට්ටක් busy අනේ message එකක් දාලා තියන්නකෝ, රිප්ලයි කරන්නම් මම ඉක්මනටම (System generated message)!";
+        console.error("❌ OpenAI API Error:", error);
+        return "Sorry මං චුට්ටක් busy. message එකක් දාලා තියන්නකෝ, රිප්ලයි කරන්නම් ඉක්මනටම! (This was system generated message)";
     }
 }
 
 client.on("message_create", async (message) => {
     try {
-        // ගෲප් මැසේජ් සහ බොට් විසින්ම යවන මැසේජ් නොසලකා හැරීම (Personal DMs පමණක් ක්‍රියාත්මක වේ)
         if (message.from.endsWith("@g.us") || message.fromMe) return;
 
         const text = message.body;
         if (!text) return;
 
-        console.log(`📩 Personal DM from ${message.from}: ${text}`);
+        console.log(`\n📩 Personal DM from ${message.from}: ${text}`);
 
-        // AI එකෙන් පිළිතුරක් ලබා ගැනීම
         const aiReply = await getAIResponse(text);
 
-        // අදාළ පුද්ගලයාට ස්වයංක්‍රීයව පිළිතුරු යැවීම
         await client.sendMessage(message.from, aiReply);
-        console.log(`🤖 AI Replied: ${aiReply}`);
+        console.log(`🤖 AI Replied Successfully: ${aiReply}`);
 
     } catch (error) {
-        console.error("Error in message handling:", error);
+        console.error("❌ Error in message handling:", error);
     }
 });
 
