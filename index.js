@@ -1,10 +1,10 @@
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
-const OpenAI = require("openai");
+const Groq = require("groq-sdk");
 
-// 🔑 මෙතැනට ඔයාගේ OpenAI (ChatGPT) API Key එක දාන්න
-const OPENAI_API_KEY = "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";
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+// 🔑 මෙතැනට ඔයාගේ Groq API Key එක දාන්න (gsk_...)
+const GROQ_API_KEY = "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";
+const groq = new Groq({ apiKey: GROQ_API_KEY });
 
 const CHROME_PATH = "/usr/bin/chromium-browser";
 
@@ -36,26 +36,26 @@ client.on("authenticated", () => {
 
 client.on("ready", () => {
     console.log("\n========================================");
-    console.log("🤖 PERSONAL AI BOT READY (ChatGPT)");
+    console.log("🤖 PERSONAL AI BOT READY (Groq Llama 3)");
     console.log("========================================");
 });
 
-// 🧠 ChatGPT (OpenAI) එකෙන් පිළිතුරු සකස් කරගැනීම
+// 🧠 Groq AI එකෙන් පිළිතුරු සකස් කරගැනීම
 async function getAIResponse(userMessage) {
     try {
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini", // ඉතාමත් වේගවත් සහ ලාභදායී මොඩල් එකක්
+        const chatCompletion = await groq.chat.completions.create({
             messages: [
                 { role: "system", content: "You are a helpful personal AI assistant. Reply naturally, politely, and concisely." },
                 { role: "user", content: userMessage }
             ],
+            model: "llama-3.3-70b-versatile",
         });
-        const textResponse = completion.choices[0].message.content;
-        console.log("💡 ChatGPT Response:", textResponse);
+        const textResponse = chatCompletion.choices[0]?.message?.content || "";
+        console.log("💡 Groq AI Response:", textResponse);
         return textResponse;
     } catch (error) {
-        console.error("❌ OpenAI API Error:", error);
-        return "Sorry මං චුට්ටක් busy. message එකක් දාලා තියන්නකෝ, රිප්ලයි කරන්නම් ඉක්මනටම! (This was system generated message)";
+        console.error("❌ Groq API Error:", error);
+        return "Sorry මං චුට්ටක් busy අනේ message එකක් දාලා තියන්නකෝ, රිප්ලයි කරන්නම් මම ඉක්මනටම!";
     }
 }
 
