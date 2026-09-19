@@ -3,7 +3,7 @@ const qrcode = require("qrcode-terminal");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // 🔑 මෙතැනට ඔයාගේ Google Gemini API Key එක දාන්න (Google AI Studio එකෙන් නොමිලේ ගන්න පුළුවන්)
-const GEMINI_API_KEY = "AQ.Ab8RN6LwKHyqEDeQO1jsrJoqYUoHjua1eCA5RgcsMPnDqrpJ9Q";
+const GEMINI_API_KEY = "AQ.Ab8RN6IR-IFk0srJy_y_MYmHFBAQI5iWvkcb9pqx_aVelMW2TQ";
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const CHROME_PATH = "/usr/bin/chromium-browser";
