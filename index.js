@@ -40,10 +40,10 @@ client.on("ready", () => {
     console.log("========================================");
 });
 
-// 🧠 Gemini AI එකෙන් පිළිතුරු සකස් කරගැනීම
+// 🧠 Gemini AI එකෙන් පිළිතුරු සකස් කරගැනීම (ಅලුත්ම Model එක සමඟ)
 async function getAIResponse(userMessage) {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
         const prompt = `You are a helpful personal AI assistant. Reply naturally, politely, and concisely to this message: "${userMessage}"`;
         const result = await model.generateContent(prompt);
         const response = await result.response;
